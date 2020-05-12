@@ -1,0 +1,33 @@
+#eureka:
+#  client:
+#    serviceUrl:
+#      defaultZone: http://localhost:3001/eureka/
+      
+spring:
+  application:
+    name: smc-auth-service
+  jpa:
+    show-sql: true
+  datasource:
+    url: jdbc:mysql://${MYSQL_HOST:localhost}:33061/smcdb
+    username: admin
+    password: passw0rd
+  cloud:
+    discovery:
+      enabled: false
+
+server:
+  port: 3002
+  
+  
+jwt:
+  header: Authorization
+  secret: mySecret
+  base64-secret: ZmQ0ZGI5NjQ0MDQwY2I4MjMxY2Y3ZmI3MjdhN2ZmMjNhODViOTg1ZGE0NTBjMGM4NDA5NzYxMjdjOWMwYWRmZTBlZjlhNGY3ZTg4Y2U3YTE1ODVkZDU5Y2Y3OGYwZWE1NzUzNWQ2YjFjZDc0NGMxZWU2MmQ3MjY1NzJmNTE0MzI
+  expiration: 604800
+  token-validity-in-seconds: 86400
+  token-validity-in-seconds-for-remember-me: 108000
+  route:
+    authentication:
+      path: /auth
+      refresh: /refresh
