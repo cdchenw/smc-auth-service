@@ -1,7 +1,5 @@
 package com.smc.config;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
@@ -25,8 +23,6 @@ import com.smc.security.jwt.TokenProvider;
 @EnableGlobalMethodSecurity(prePostEnabled = true, securedEnabled = true)
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	
-	private final Logger log = LoggerFactory.getLogger(WebSecurityConfig.class);
-
 	private final TokenProvider tokenProvider;
 	private final CorsFilter corsFilter;
 	private final JwtAuthenticationEntryPoint authenticationErrorHandler;

@@ -1,7 +1,10 @@
-#eureka:
-#  client:
-#    serviceUrl:
-#      defaultZone: http://localhost:3001/eureka/
+eureka:
+  instance:
+    lease-expiration-duration-in-seconds: 30
+    lease-renewal-interval-in-seconds: 10
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:3001/eureka/
       
 spring:
   application:
@@ -12,12 +15,14 @@ spring:
     url: jdbc:mysql://${MYSQL_HOST:localhost}:33061/smcdb
     username: admin
     password: passw0rd
-  cloud:
-    discovery:
-      enabled: false
+#  cloud:
+#    discovery:
+#      enabled: false
 
 server:
   port: 3002
+  servlet:
+    context-path: /api
   
   
 jwt:
