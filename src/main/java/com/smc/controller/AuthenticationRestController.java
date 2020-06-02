@@ -17,7 +17,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
@@ -28,56 +27,69 @@ import javax.validation.Valid;
 @RestController
 public class AuthenticationRestController {
 
-   private final TokenProvider tokenProvider;
-   private final AuthenticationManagerBuilder authenticationManagerBuilder;
-   private final UserService userService;
+	private final TokenProvider tokenProvider;
+	private final AuthenticationManagerBuilder authenticationManagerBuilder;
+	private final UserService userService;
 
-   public AuthenticationRestController(TokenProvider tokenProvider, AuthenticationManagerBuilder authenticationManagerBuilder, UserService userService) {
-      this.tokenProvider = tokenProvider;
-      this.authenticationManagerBuilder = authenticationManagerBuilder;
-      this.userService = userService;
-   }
+	public AuthenticationRestController(TokenProvider tokenProvider,AuthenticationManagerBuilder authenticationManagerBuilder, UserService userService) {
+		this.tokenProvider = tokenProvider;
+		this.authenticationManagerBuilder = authenticationManagerBuilder;
+		this.userService = userService;
+	}
 
-   @PostMapping("/authenticate")
-   public ResponseEntity<JWTToken> authorize(@Valid @RequestBody LoginDto loginDto) {
+	@PostMapping("/authenticate")
+	public ResponseEntity<JWTToken> authorize(@Valid @RequestBody LoginDto loginDto) {
 
-      UsernamePasswordAuthenticationToken authenticationToken =
-         new UsernamePasswordAuthenticationToken(loginDto.getUsername(), loginDto.getPassword());
+		UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(loginDto.getEmail(), loginDto.getPassword());
 
-      Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
-      SecurityContextHolder.getContext().setAuthentication(authentication);
+		Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
+		SecurityContextHolder.getContext().setAuthentication(authentication);
 
-      String jwt = tokenProvider.createToken(authentication, false);
+		String jwt = tokenProvider.createToken(authentication, false);
 
-      HttpHeaders httpHeaders = new HttpHeaders();
-      httpHeaders.add(JWTFilter.AUTHORIZATION_HEADER, jwt);
+		HttpHeaders httpHeaders = new HttpHeaders();
+		httpHeaders.add(JWTFilter.AUTHORIZATION_HEADER, jwt);
 
-      return new ResponseEntity<>(new JWTToken(jwt), httpHeaders, HttpStatus.OK);
-   }
+		User user = userService.getUserWithAuthorities().get();
 
-   @GetMapping("/currentuser")
-   public ResponseEntity<User> getActualUser() {
-      return ResponseEntity.ok(userService.getUserWithAuthorities().get());
-   }
-   
-   /**
-    * Object to return as body in JWT Authentication.
-    */
-   static class JWTToken {
+		return new ResponseEntity<>(new JWTToken(jwt, user), httpHeaders, HttpStatus.OK);
+	}
 
-      private String idToken;
+	@GetMapping("/currentuser")
+	public ResponseEntity<User> getActualUser() {
+		return ResponseEntity.ok(userService.getUserWithAuthorities().get());
+	}
 
-      JWTToken(String idToken) {
-         this.idToken = idToken;
-      }
+	/**
+	 * Object to return as body in JWT Authentication.
+	 */
+	static class JWTToken {
 
-      @JsonProperty("id_token")
-      String getIdToken() {
-         return idToken;
-      }
+		private String idToken;
 
-      void setIdToken(String idToken) {
-         this.idToken = idToken;
-      }
-   }
+		private User user;
+
+		JWTToken(String idToken, User user) {
+			this.idToken = idToken;
+			this.user = user;
+		}
+
+		@JsonProperty("id_token")
+		String getIdToken() {
+			return idToken;
+		}
+
+		void setIdToken(String idToken) {
+			this.idToken = idToken;
+		}
+
+		public User getUser() {
+			return user;
+		}
+
+		public void setUser(User user) {
+			this.user = user;
+		}
+
+	}
 }

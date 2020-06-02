@@ -11,7 +11,6 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.web.filter.CorsFilter;
 
 import com.smc.model.UserType;
 import com.smc.security.JwtAccessDeniedHandler;
@@ -24,14 +23,12 @@ import com.smc.security.jwt.TokenProvider;
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	
 	private final TokenProvider tokenProvider;
-	private final CorsFilter corsFilter;
 	private final JwtAuthenticationEntryPoint authenticationErrorHandler;
 	private final JwtAccessDeniedHandler jwtAccessDeniedHandler;
 
-	public WebSecurityConfig(TokenProvider tokenProvider, CorsFilter corsFilter,
+	public WebSecurityConfig(TokenProvider tokenProvider, 
 			JwtAuthenticationEntryPoint authenticationErrorHandler, JwtAccessDeniedHandler jwtAccessDeniedHandler) {
 		this.tokenProvider = tokenProvider;
-		this.corsFilter = corsFilter;
 		this.authenticationErrorHandler = authenticationErrorHandler;
 		this.jwtAccessDeniedHandler = jwtAccessDeniedHandler;
 	}
@@ -52,8 +49,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 		httpSecurity
 			// we don't need CSRF because our token is invulnerable
 			.csrf().disable()
-
-			.addFilterBefore(corsFilter, UsernamePasswordAuthenticationFilter.class)
+			
+			.addFilter(new UsernamePasswordAuthenticationFilter())
 
 			.exceptionHandling().authenticationEntryPoint(authenticationErrorHandler)
 			.accessDeniedHandler(jwtAccessDeniedHandler)
