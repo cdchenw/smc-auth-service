@@ -64,6 +64,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 			// ignore some api auth
 			.and().authorizeRequests()
 			.antMatchers("/authenticate").permitAll()
+			.antMatchers("/currentuser").permitAll()
 			.antMatchers("/regist").permitAll()
 
 			// role validate for special api
